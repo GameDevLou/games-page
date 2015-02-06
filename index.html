@@ -18,7 +18,7 @@
 @media (min-width: 1025px) {
   .game {
   	height: 220px;
-    width:48%;
+    width: 275px;
     margin: 5px;
   }
 }
@@ -37,6 +37,11 @@
 .game h3{
 	height: 70px;
 	margin: 2px auto;
+}
+.game h3 span{
+	margin-left: 5px;
+	font-size: 12px;
+	font-weight: 200;
 }
 
 .photoHolder{
@@ -81,7 +86,7 @@ var defaultImage = "http://gamedevlou.org/wp-content/uploads/2015/02/needs-image
 jQuery.getJSON(url).success(function(data) {
 	games = data.feed.entry;
 
-	createDirectory(games, ".gamesList");
+	createGamesList(games, ".gamesList");
 
 	$(".gameCount").text(games.length);
 
@@ -92,7 +97,7 @@ jQuery.getJSON(url).success(function(data) {
 	$(".gamesList").append("There was an error loading the games");
 });
 
-function createDirectory(games, div){
+function createGamesList(games, div){
 	for (var i =0; i < games.length; i++){
 		var game = games[i];
 		cleanGoogleDocsData(game);
@@ -101,13 +106,15 @@ function createDirectory(games, div){
 }
 
 function addgame(game, div){
-	$(div).append("<div class='game'>" 
+	if(hasContent(game.releasedate.$t)) {
+		$(div).append("<div class='game'>" 
 		+ "<a href='" + game.link.$t + "' target='_blank'>"
 			+ "<div class='photoHolder'>"
 				+ addPhoto(game) 
 			+ "</div>"
 			+ addName(game)
 		+ "</a></div>");
+	}
 }
 
 function addPhoto(game) {
@@ -122,7 +129,7 @@ function addPhoto(game) {
 function addName(game){
 	var gamename = game.gamename.$t;
 	if(hasContent(gamename)) {
-		return "<h3>" + gamename + "</h3>";
+		return "<h3>" + gamename + "<span>(" + game.releasedate.$t + ")</span></h3>";
 	}
 	return "";
 }
