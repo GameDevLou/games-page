@@ -2,33 +2,67 @@
 * {-webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
+
+.gamesList{
+  	text-align: center;
+}
+
 .game {
-  float: left;
   display: inline-block;
-  width: 48%;
+
   margin: 5px;
   text-align: center;
+  vertical-align: top;
+}
+
+@media (min-width: 1025px) {
+  .game {
+  	height: 220px;
+    width:48%;
+    margin: 5px;
+  }
+}
+@media (min-width: 0px) and (max-width: 1024px) {
+  .game {
+    width: 100%;
+    margin: 5px 0 15px 0;
+  }
 }
 
 .game a, .game a:hover, .game a:visited{
 	color: #000;
+	text-decoration: none !important;
 }
 
 .game h3{
-	text-decoration: none;
 	height: 70px;
 	margin: 2px auto;
 }
 
 .photoHolder{
-	max-width: 100%;
-	max-height: 200px;
+	display: block;
+	position: relative;
+	text-align: center;
+	width: 100%;
+	margin: 0 auto;
 }
 
 .photoHolder img{
+	margin: 0 auto;
 	max-width: 100%;
-	max-height: 200px;
 }
+@media (min-width: 1025px) {
+  .photoHolder img {	
+	max-height: 150px;
+  }
+}
+@media (min-width: 0px) and (max-width: 1024px) {
+  .photoHolder img {
+    max-height: 300px;
+  }
+}
+
+
 </style>
 
 <h3> <span class="gameCount"></span> indie games made in Louisville!</h3>
@@ -42,6 +76,7 @@
 var docId = "1OkeugKNdbYvkqztkKoW4Y2SNE1h84hMFZdA3jZSSpUI";
 var url = "https://spreadsheets.google.com/feeds/list/" + docId + "/od6/public/values?alt=json-in-script&callback=?";
 var games;
+var defaultImage = "http://gamedevlou.org/wp-content/uploads/2015/02/needs-image.png";
 
 jQuery.getJSON(url).success(function(data) {
 	games = data.feed.entry;
@@ -78,7 +113,7 @@ function addgame(game, div){
 function addPhoto(game) {
 	var photoURL = game.photourl.$t;
 	if(!hasContent(photoURL)){
-		return "";
+		return "<img class='gamePhoto' src='" + defaultImage + "'></img>";
 	}
 	return "<img class='gamePhoto' src='" + photoURL + "'></img>";
 }
