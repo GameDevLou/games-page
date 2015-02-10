@@ -38,11 +38,6 @@
 	height: 70px;
 	margin: 2px auto;
 }
-.game h3 span{
-	margin-left: 5px;
-	font-size: 12px;
-	font-weight: 200;
-}
 
 .photoHolder{
 	display: block;
@@ -70,7 +65,7 @@
 
 </style>
 
-<h3> <span class="gameCount"></span> indie games made in Louisville!</h3>
+<h3> <span class="gameCount"></span> games we are working hard on!</h3>
 
 
 	<div class="gamesList"></div>
@@ -101,7 +96,7 @@ function countGames(games){
 	var count = 0;
 	for (var i =0; i < games.length; i++){
 		var game = games[i];
-		if(hasContent(game.releasedate.$t)) {
+		if(!hasContent(game.releasedate.$t)) {
 			count ++;
 		}
 	}
@@ -117,7 +112,7 @@ function createGamesList(games, div){
 }
 
 function addgame(game, div){
-	if(hasContent(game.releasedate.$t)) {
+	if(!hasContent(game.releasedate.$t)) {
 		$(div).append("<div class='game'>" 
 		+ "<a href='" + game.link.$t + "' target='_blank'>"
 			+ "<div class='photoHolder'>"
@@ -140,7 +135,7 @@ function addPhoto(game) {
 function addName(game){
 	var gamename = game.gamename.$t;
 	if(hasContent(gamename)) {
-		return "<h3>" + gamename + "<span>(" + game.releasedate.$t + ")</span></h3>";
+		return "<h3>" + gamename + "</h3>";
 	}
 	return "";
 }
