@@ -24,7 +24,7 @@ function createModel($table){
 		foreach ($row as $key => $value) {
 			if( strpos($key, 'gsx$') !== FALSE){
 				$fieldName = str_replace('gsx$', '', $key );
-				$content = $value['$t'];
+				$content = htmlspecialchars( str_replace("'", "", $value['$t']) );
 				$newItem->$fieldName = $content;
 			}
 		}
@@ -77,27 +77,20 @@ function countGames( $games, $wip ) {
 }
 
 function addAnchor( $game ) {
-	$name = "<a name='";
-	if ( !empty( $game['gsx$firstname']['$t'] ) ) {
-		$name .= strtolower( htmlspecialchars( $game['gsx$firstname']['$t'] ) );
-	}
-	if ( !empty( $game['gsx$lastname']['$t'] ) ) {
-		$name .= strtolower( htmlspecialchars( $game['gsx$lastname']['$t'] ) );
-	}
-	return $name . "'></a>";
+	$name = "<a name='" . str_replace(" ", "", addName( $game ) ) . "'></a>";
 }
 
 function addName( $game ) {
 	if ( !empty( $game->gamename ) ) {
-		return htmlspecialchars( $game->gamename );
+		return $game->gamename;
 	}
 }
 
 function addAuthor( $game ) {
 	if ( !empty( $game->studio ) ) {
-		return htmlspecialchars( $game->studio );
+		return $game->studio;
 	}else if (!empty( $game->people ) ){
-		return htmlspecialchars( $game->people );
+		return $game->people;
 	}else{
 		return "unknown";
 	}
@@ -107,7 +100,7 @@ function addLink( $game ) {
 	if ( empty( $game->link ) ) {
 		return "";
 	}
-	return htmlspecialchars( $game->link );
+	return $game->link;
 }
 
 function addPhoto( $game ) {
@@ -115,7 +108,7 @@ function addPhoto( $game ) {
 	if ( empty( $photoURL ) ) {
 		return "<img class='gamePhoto' src='http://gamedevlou.org/wp-content/uploads/2015/02/needs-image.png'></img>";
 	}
-	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". addName( $game ) ." by  " . addAuthor( $game) . "' title='". addName( $game ) ." by  " . addAuthor( $game) . "'></img>";
+	return "<img class='gamePhoto' src='" . $photoURL . "' alt='". addName( $game ) ." by  " . addAuthor( $game ) . "' title='". addName( $game ) ." by  " . addAuthor( $game ) . "'></img>";
 }
 
 function addBadge( $game, $jams ) {
