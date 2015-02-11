@@ -9,7 +9,13 @@ $jams = googleSheetData($gameDevLouJams);
 
 function googleSheetData($docId){
 	$url = "http://spreadsheets.google.com/feeds/list/" . $docId . "/od6/public/values?alt=json&amp;callback=displayContent";
-	$json = file_get_contents( $url );
+	try {
+		$json = file_get_contents( $url );
+	} catch (Exception $e) {
+		echo " I AM ERROR <br>";
+		echo $e;
+		return;
+	}
 	$data = json_decode( $json, TRUE );
 	return $data['feed']['entry'];
 }
@@ -18,7 +24,7 @@ $gamesModel = createModel($games);
 $jamsModel = createModel($jams);
 
 function createModel($table){
-	$model = [];
+	$model = array();
 	foreach ( $table as $row ) {
 		$newItem = new stdClass;
 		foreach ($row as $key => $value) {
@@ -78,7 +84,7 @@ function countGames( $games, $wip ) {
 }
 
 function addAnchor( $game ) {
-	return "<a name='" . strtolower( str_replace([" ", ".", ",", "!", "&rsquo;"], "", addName( $game ) ) ). "'></a>";
+	return "<a name='" . strtolower( str_replace(array(" ", ".", ",", "!", "&rsquo;"), "", addName( $game ) ) ). "'></a>";
 }
 
 function addName( $game ) {
