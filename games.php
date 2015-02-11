@@ -123,7 +123,15 @@ function addBadge( $game, $jams ) {
 }
 ?>
 
-<h3><?php echo countGames( $gamesModel, $wip ); ?>  indie games made in Louisville!</h3>
+<h3>
+	<?php echo countGames( $gamesModel, $wip ); 
+	if ($wip ){ 
+		echo " games we are working hard on!";
+	}else{
+		echo " indie games made in Louisville!";
+	}
+	?>
+</h3>
 
 <div class="gamesList">
 	<?php echo displayGames( $gamesModel, $jamsModel, $wip ); ?>
