@@ -88,7 +88,7 @@ function addPhoto( $game ) {
 	if ( empty( $photoURL ) ) {
 		return "<img class='gamePhoto' src='http://gamedevlou.org/wp-content/uploads/2015/02/needs-image.png'></img>";
 	}
-	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". addName( $game ) ." by  " . addAuthor( $game) . "'></img>";
+	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". addName( $game ) ." by  " . addAuthor( $game) . "' title='". addName( $game ) ." by  " . addAuthor( $game) . "'></img>";
 }
 
 $badgeData = (object) array(
