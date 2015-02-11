@@ -1,9 +1,11 @@
 <?php
+$wip = false;
+
 $gameDevLouGames = "1OkeugKNdbYvkqztkKoW4Y2SNE1h84hMFZdA3jZSSpUI";
+$gameDevLouJams = "1yAFycceiw7hi3uIGfPof49V7jGJ0MzTlh0C-2YtS80Q";
 
 $games = googleSheetData($gameDevLouGames);
-
-$wip = false;
+$jams = googleSheetData($gameDevLouJams);
 
 function googleSheetData($docId){
 	$url = "http://spreadsheets.google.com/feeds/list/" . $docId . "/od6/public/values?alt=json&amp;callback=displayContent";
@@ -13,6 +15,7 @@ function googleSheetData($docId){
 }
 
 $gamesModel = createGamesModel($games);
+$jamsModel = createJamsModel($jams);
 
 function createGamesModel($games){
 	$model = [];
@@ -42,14 +45,31 @@ function createGamesModel($games){
 	return $model;
 }
 
-function displayGames( $games, $badgeData, $wip ) {
+function createJamsModel($jams){
+	$model = [];
+	foreach ( $jams as $jam ) {
+		$newItem = (object) array(
+			'name' => $jam['gsx$name']['$t'],
+			'hashtag' => $jam['gsx$hashtag']['$t'],
+			'month' => $jam['gsx$month']['$t'],
+			'year' => $jam['gsx$year']['$t'],
+			'theme' => $jam['gsx$theme']['$t'],
+			'image' => $jam['gsx$image']['$t'],
+			'location' => $jam['gsx$location']['$t'],
+			);
+		array_push($model, $newItem);
+	}
+	return $model;
+}
+
+function displayGames( $games, $jams, $wip ) {
 	$gamesHTML = "";
 	foreach ( $games as $game ) {
 		if ( $game->showonsite == "TRUE" ) {
 			$newGame = "<div class='game'>"
 				. "<a href='" . addLink( $game ) . "' target='_blank'>"
 				. "<div class='photoHolder'>"
-				. addPhoto( $game ) . addBadge( $game, $badgeData )
+				. addPhoto( $game ) . addBadge( $game, $jams )
 				. "</div><h3>"
 				. addName( $game )
 				. "</h3></a></div>";
@@ -127,43 +147,12 @@ function addPhoto( $game ) {
 	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". addName( $game ) ." by  " . addAuthor( $game) . "' title='". addName( $game ) ." by  " . addAuthor( $game) . "'></img>";
 }
 
-$badgeData = (object) array(
-	'ggj14' => (object) array(
-		'name' => 'ggj14',
-		'link' => 'ggj14link',
-		'description' => 'Global Game Jam - 2014 - We dont see things as they are, we see them as we are.',
-		'image' => 'http://gamedevlou.org/wp-content/uploads/2015/02/badge-ggj14.png'
-	),
-	'ld29' => (object) array(
-		'name' => 'ld29',
-		'link' => 'ld29link',
-		'description' => 'Ludum Dare 29 - April 2014	- Beneath the surface',
-		'image' => 'http://gamedevlou.org/wp-content/uploads/2015/02/badge-ld29.png'
-	),
-	'ld30' => (object) array(
-		'name' => 'ld30',
-		'link' => 'ld30link',
-		'description' => 'Ludum Dare 30 - August 2014 - Connected Worlds',
-		'image' => 'http://gamedevlou.org/wp-content/uploads/2015/02/badge-ld30.png'
-	),
-	'ld31' => (object) array(
-		'name' => 'ld31',
-		'link' => 'ld31link',
-		'description' => 'Ludum Dare 31 - December 2014 - Entire Game on One Screen!',
-		'image' => 'http://gamedevlou.org/wp-content/uploads/2015/02/badge-ld31.png'
-	),
-	'ggj15' => (object) array(
-		'name' => 'ggj15',
-		'link' => 'ggj15link',
-		'description' => 'Global Game Jam - 2015 - What do we do now?',
-		'image' => 'http://gamedevlou.org/wp-content/uploads/2015/02/badge-ggj15.png'
-	)
-);
-
-function addBadge( $game, $data ) {
-	$jam = strtolower( str_replace( '#', '', $game->jam ) );
-	if( array_key_exists( $jam, $data ) ) {
-		return "<img class='badge' src='" . $data -> $jam ->image . "' alt='" . $data -> $jam ->description . "' title='" . $data -> $jam ->description . "'/>";
+function addBadge( $game, $jams ) {
+	foreach ( $jams as $jam ) {
+		if( $jam->hashtag == $game->jam){
+			$description = $jam->name . " - " . $jam->month . " - " . $jam->year . " - " . $jam->theme;
+			return "<img class='badge' src='" . $jam->image . "'  alt='" . $description . "' title='" . $description . "'/>";
+		}
 	}
 	return "";
 }
@@ -172,7 +161,7 @@ function addBadge( $game, $data ) {
 <h3><?php echo countGames( $gamesModel, $wip ); ?>  indie games made in Louisville!</h3>
 
 <div class="gamesList">
-	<?php echo displayGames( $gamesModel, $badgeData, $wip ); ?>
+	<?php echo displayGames( $gamesModel, $jamsModel, $wip ); ?>
 </div>
 
 <style>
