@@ -62,7 +62,17 @@ function addAnchor( $game ) {
 
 function addName( $game ) {
 	if ( !empty( $game['gsx$gamename']['$t'] ) ) {
-		return $game['gsx$gamename']['$t'];
+		return htmlspecialchars( $game['gsx$gamename']['$t'] );
+	}
+}
+
+function addAuthor( $game ) {
+	if ( !empty( $game['gsx$studio']['$t'] ) ) {
+		return htmlspecialchars( $game['gsx$studio']['$t'] );
+	}else if (!empty( $game['gsx$people']['$t'] ) ){
+		return htmlspecialchars( $game['gsx$people']['$t'] );
+	}else{
+		return "unknown";
 	}
 }
 
@@ -78,18 +88,7 @@ function addPhoto( $game ) {
 	if ( empty( $photoURL ) ) {
 		return "<img class='gamePhoto' src='http://gamedevlou.org/wp-content/uploads/2015/02/needs-image.png'></img>";
 	}
-	$name = "";
-	if ( !empty( $game['gsx$firstname']['$t'] ) ) {
-		$name .= $game['gsx$firstname']['$t'] . " ";
-	}
-	if ( !empty( $game['gsx$lastname']['$t'] ) ) {
-		$name .= $game['gsx$lastname']['$t'];
-	}
-	$location = "";
-	if ( !empty( $game['gsx$location']['$t'] ) ) {
-		$location .= $game['gsx$location']['$t'];
-	}
-	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". htmlspecialchars( $name ) ." - independant game developer - " . htmlspecialchars( $location ) . "'></img>";
+	return "<img class='gamePhoto' src='" . htmlspecialchars( $photoURL ) . "' alt='". addName( $game ) ." by  " . addAuthor( $game) . "'></img>";
 }
 
 $badgeData = (object) array(
