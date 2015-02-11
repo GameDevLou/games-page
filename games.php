@@ -38,6 +38,7 @@ function displayGames( $games, $jams, $wip ) {
 	foreach ( $games as $game ) {
 		if ( $game->showonsite == "TRUE" ) {
 			$newGame = "<div class='game'>"
+				. addAnchor( $game )
 				. "<a href='" . addLink( $game ) . "' target='_blank'>"
 				. "<div class='photoHolder'>"
 				. addPhoto( $game ) . addBadge( $game, $jams )
@@ -77,7 +78,7 @@ function countGames( $games, $wip ) {
 }
 
 function addAnchor( $game ) {
-	$name = "<a name='" . str_replace(" ", "", addName( $game ) ) . "'></a>";
+	return "<a name='" . strtolower( str_replace([" ", ".", ",", "!", "&rsquo;"], "", addName( $game ) ) ). "'></a>";
 }
 
 function addName( $game ) {
