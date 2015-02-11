@@ -1,15 +1,51 @@
 <?php
-$docId = "1OkeugKNdbYvkqztkKoW4Y2SNE1h84hMFZdA3jZSSpUI";
-$url = "http://spreadsheets.google.com/feeds/list/" . $docId . "/od6/public/values?alt=json&amp;callback=displayContent";
-$json = file_get_contents( $url );
-$data = json_decode( $json, TRUE );
-$Games = $data['feed']['entry'];
+$gameDevLouGames = "1OkeugKNdbYvkqztkKoW4Y2SNE1h84hMFZdA3jZSSpUI";
+
+$games = googleSheetData($gameDevLouGames);
+
 $wip = false;
 
-function displayGames( $Games, $badgeData, $wip ) {
-	$GamesHTML = "";
-	foreach ( $Games as $game ) {
-		if ( $game['gsx$showonsite']['$t'] == "TRUE" ) {
+function googleSheetData($docId){
+	$url = "http://spreadsheets.google.com/feeds/list/" . $docId . "/od6/public/values?alt=json&amp;callback=displayContent";
+	$json = file_get_contents( $url );
+	$data = json_decode( $json, TRUE );
+	return $data['feed']['entry'];
+}
+
+$gamesModel = createGamesModel($games);
+
+function createGamesModel($games){
+	$model = [];
+	foreach ( $games as $game ) {
+		$newItem = (object) array(
+			'gamename' => $game['gsx$gamename']['$t'],
+			'showonsite' => $game['gsx$showonsite']['$t'],
+			'releasedate' => $game['gsx$releasedate']['$t'],
+			'studio' => $game['gsx$studio']['$t'],
+			'people' => $game['gsx$people']['$t'],
+			'link' => $game['gsx$link']['$t'],
+			'photourl' => $game['gsx$photourl']['$t'],
+			'jam' => $game['gsx$jam']['$t'],
+			'tagline' => $game['gsx$tagline']['$t'],
+			'description' => $game['gsx$description']['$t'],
+			'twitter' => $game['gsx$twitter']['$t'],
+			'kickstarter' => $game['gsx$kickstarter']['$t'],
+			'steam' => $game['gsx$steam']['$t'],
+			'appstore' => $game['gsx$appstore']['$t'],
+			'googleplay' => $game['gsx$googleplay']['$t'],
+			'windowsstore' => $game['gsx$windowsstore']['$t'],
+			'itchio' => $game['gsx$itchio']['$t'],
+			'chromewebstore' => $game['gsx$chromewebstore']['$t'],
+			);
+		array_push($model, $newItem);
+	}
+	return $model;
+}
+
+function displayGames( $games, $badgeData, $wip ) {
+	$gamesHTML = "";
+	foreach ( $games as $game ) {
+		if ( $game->showonsite == "TRUE" ) {
 			$newGame = "<div class='game'>"
 				. "<a href='" . addLink( $game ) . "' target='_blank'>"
 				. "<div class='photoHolder'>"
@@ -18,29 +54,29 @@ function displayGames( $Games, $badgeData, $wip ) {
 				. addName( $game )
 				. "</h3></a></div>";
 			if ( $wip ) {
-				if ( empty( $game['gsx$releasedate']['$t'] ) ) {
-					$GamesHTML .= $newGame;
+				if ( empty( $game->releasedate ) ) {
+					$gamesHTML .= $newGame;
 				}
 			}else {
-				if ( !empty( $game['gsx$releasedate']['$t'] ) ) {
-					$GamesHTML .= $newGame;
+				if ( !empty( $game->releasedate ) ) {
+					$gamesHTML .= $newGame;
 				}
 			}
 		}
 	}
-	return $GamesHTML;
+	return $gamesHTML;
 }
 
-function countGames( $Games, $wip ) {
+function countGames( $games, $wip ) {
 	$count = 0;
-	foreach ( $Games as $game ) {
-		if ( $game['gsx$showonsite']['$t'] == "TRUE" ) {
+	foreach ( $games as $game ) {
+		if ( $game->showonsite == "TRUE" ) {
 			if ( $wip ) {
-				if ( empty( $game['gsx$releasedate']['$t'] ) ) {
+				if ( empty( $game->releasedate ) ) {
 					$count ++;
 				}
 			}else {
-				if ( !empty( $game['gsx$releasedate']['$t'] ) ) {
+				if ( !empty( $game->releasedate ) ) {
 					$count ++;
 				}
 			}
@@ -61,30 +97,30 @@ function addAnchor( $game ) {
 }
 
 function addName( $game ) {
-	if ( !empty( $game['gsx$gamename']['$t'] ) ) {
-		return htmlspecialchars( $game['gsx$gamename']['$t'] );
+	if ( !empty( $game->gamename ) ) {
+		return htmlspecialchars( $game->gamename );
 	}
 }
 
 function addAuthor( $game ) {
-	if ( !empty( $game['gsx$studio']['$t'] ) ) {
-		return htmlspecialchars( $game['gsx$studio']['$t'] );
-	}else if (!empty( $game['gsx$people']['$t'] ) ){
-		return htmlspecialchars( $game['gsx$people']['$t'] );
+	if ( !empty( $game->studio ) ) {
+		return htmlspecialchars( $game->studio );
+	}else if (!empty( $game->people ) ){
+		return htmlspecialchars( $game->people );
 	}else{
 		return "unknown";
 	}
 }
 
 function addLink( $game ) {
-	if ( empty( $game['gsx$link']['$t'] ) ) {
+	if ( empty( $game->link ) ) {
 		return "";
 	}
-	return htmlspecialchars( $game['gsx$link']['$t'] );
+	return htmlspecialchars( $game->link );
 }
 
 function addPhoto( $game ) {
-	$photoURL = $game['gsx$photourl']['$t'];
+	$photoURL = $game->photourl;
 	if ( empty( $photoURL ) ) {
 		return "<img class='gamePhoto' src='http://gamedevlou.org/wp-content/uploads/2015/02/needs-image.png'></img>";
 	}
@@ -125,7 +161,7 @@ $badgeData = (object) array(
 );
 
 function addBadge( $game, $data ) {
-	$jam = strtolower( str_replace( '#', '', $game['gsx$jam']['$t'] ) );
+	$jam = strtolower( str_replace( '#', '', $game->jam ) );
 	if( array_key_exists( $jam, $data ) ) {
 		return "<img class='badge' src='" . $data -> $jam ->image . "' alt='" . $data -> $jam ->description . "' title='" . $data -> $jam ->description . "'/>";
 	}
@@ -133,10 +169,10 @@ function addBadge( $game, $data ) {
 }
 ?>
 
-<h3><?php echo countGames( $Games, $wip ); ?>  indie games made in Louisville!</h3>
+<h3><?php echo countGames( $gamesModel, $wip ); ?>  indie games made in Louisville!</h3>
 
 <div class="gamesList">
-	<?php echo displayGames( $Games, $badgeData, $wip ); ?>
+	<?php echo displayGames( $gamesModel, $badgeData, $wip ); ?>
 </div>
 
 <style>
