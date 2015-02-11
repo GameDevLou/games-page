@@ -14,49 +14,20 @@ function googleSheetData($docId){
 	return $data['feed']['entry'];
 }
 
-$gamesModel = createGamesModel($games);
-$jamsModel = createJamsModel($jams);
+$gamesModel = createModel($games);
+$jamsModel = createModel($jams);
 
-function createGamesModel($games){
+function createModel($table){
 	$model = [];
-	foreach ( $games as $game ) {
-		$newItem = (object) array(
-			'gamename' => $game['gsx$gamename']['$t'],
-			'showonsite' => $game['gsx$showonsite']['$t'],
-			'releasedate' => $game['gsx$releasedate']['$t'],
-			'studio' => $game['gsx$studio']['$t'],
-			'people' => $game['gsx$people']['$t'],
-			'link' => $game['gsx$link']['$t'],
-			'photourl' => $game['gsx$photourl']['$t'],
-			'jam' => $game['gsx$jam']['$t'],
-			'tagline' => $game['gsx$tagline']['$t'],
-			'description' => $game['gsx$description']['$t'],
-			'twitter' => $game['gsx$twitter']['$t'],
-			'kickstarter' => $game['gsx$kickstarter']['$t'],
-			'steam' => $game['gsx$steam']['$t'],
-			'appstore' => $game['gsx$appstore']['$t'],
-			'googleplay' => $game['gsx$googleplay']['$t'],
-			'windowsstore' => $game['gsx$windowsstore']['$t'],
-			'itchio' => $game['gsx$itchio']['$t'],
-			'chromewebstore' => $game['gsx$chromewebstore']['$t'],
-			);
-		array_push($model, $newItem);
-	}
-	return $model;
-}
-
-function createJamsModel($jams){
-	$model = [];
-	foreach ( $jams as $jam ) {
-		$newItem = (object) array(
-			'name' => $jam['gsx$name']['$t'],
-			'hashtag' => $jam['gsx$hashtag']['$t'],
-			'month' => $jam['gsx$month']['$t'],
-			'year' => $jam['gsx$year']['$t'],
-			'theme' => $jam['gsx$theme']['$t'],
-			'image' => $jam['gsx$image']['$t'],
-			'location' => $jam['gsx$location']['$t'],
-			);
+	foreach ( $table as $row ) {
+		$newItem = new stdClass;
+		foreach ($row as $key => $value) {
+			if( strpos($key, 'gsx$') !== FALSE){
+				$fieldName = str_replace('gsx$', '', $key );
+				$content = $value['$t'];
+				$newItem->$fieldName = $content;
+			}
+		}
 		array_push($model, $newItem);
 	}
 	return $model;
